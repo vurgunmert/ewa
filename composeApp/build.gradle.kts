@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -8,6 +7,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -17,42 +17,50 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-    
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     sourceSets {
-        
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-        }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+        val commonMain by getting {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
-            implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
-            implementation("media.kamel:kamel-image:0.9.5")
-            implementation("io.ktor:ktor-client-core:2.3.12")
-            implementation("io.ktor:ktor-client-cio:2.3.12")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+                implementation("io.ktor:ktor-client-core:2.3.12")
+                implementation("io.insert-koin:koin-core:3.5.6") // Add Koin Core
+            }
         }
 
-        iosMain.dependencies {
-            implementation("io.ktor:ktor-client-darwin:2.3.12")
+        val androidMain by getting {
+            dependencies {
+                implementation(compose.preview)
+                implementation("androidx.activity:activity-compose:1.9.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+                implementation("io.insert-koin:koin-android:3.5.6")
+                implementation("io.insert-koin:koin-androidx-compose:3.5.6")
+
+                implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+                implementation("com.google.firebase:firebase-config")
+                implementation("com.google.firebase:firebase-auth")
+                implementation("com.google.firebase:firebase-firestore")
+                implementation("com.google.firebase:firebase-analytics")
+            }
+        }
+
+        val iosMain by creating {
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:2.3.12")
+            }
         }
     }
 }
@@ -89,8 +97,20 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.0.5"
+    }
     dependencies {
         debugImplementation(compose.uiTooling)
     }
 }
 
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("io.insert-koin:koin-core:3.5.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    implementation(libs.firebase.common.ktx)
+}
