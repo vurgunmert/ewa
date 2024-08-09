@@ -21,6 +21,8 @@ ktorClientContentNegotiation = "3.0.0-beta-2"
 orgJetbrainsKotlinNativeCocoapodsGradlePlugin = "2.0.20-RC"
 firebasePerfKtx = "21.0.1"
 firebaseCommonKtx = "21.0.0"
+firebaseMessagingKtx = "24.0.0"
+generativeai = "0.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -40,6 +42,8 @@ ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-conte
 org-jetbrains-kotlin-native-cocoapods-gradle-plugin = { group = "org.jetbrains.kotlin.native.cocoapods", name = "org.jetbrains.kotlin.native.cocoapods.gradle.plugin", version.ref = "orgJetbrainsKotlinNativeCocoapodsGradlePlugin" }
 firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx", version.ref = "firebasePerfKtx" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

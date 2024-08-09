@@ -35,6 +35,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
                 implementation("io.ktor:ktor-client-core:2.3.12")
                 implementation("io.insert-koin:koin-core:3.5.6") // Add Koin Core
             }
@@ -43,17 +44,25 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(compose.preview)
+                implementation("com.google.android.material:material:1.12.0")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+                implementation("androidx.appcompat:appcompat:1.7.0")
                 implementation("androidx.activity:activity-compose:1.9.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
                 implementation("io.insert-koin:koin-android:3.5.6")
                 implementation("io.insert-koin:koin-androidx-compose:3.5.6")
 
+                implementation(libs.generativeai)
                 implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
                 implementation("com.google.firebase:firebase-config")
                 implementation("com.google.firebase:firebase-auth")
                 implementation("com.google.firebase:firebase-firestore")
                 implementation("com.google.firebase:firebase-analytics")
+//                implementation("com.google.firebase:firebase-perf-ktx")
+
+                implementation("app.rive:rive-android:9.5.6")
+                implementation("androidx.startup:startup-runtime:1.1.1")
+
             }
         }
 
@@ -106,11 +115,9 @@ android {
 }
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
     implementation("io.insert-koin:koin-core:3.5.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
     implementation(libs.firebase.common.ktx)
+    implementation(libs.firebase.messaging.ktx)
 }
