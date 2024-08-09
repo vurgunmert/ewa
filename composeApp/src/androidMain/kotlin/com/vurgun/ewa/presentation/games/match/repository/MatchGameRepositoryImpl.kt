@@ -24,22 +24,6 @@ class MatchGameRepositoryImpl(
         levelConfiguration: LevelConfiguration
     ): List<TextElement> = fetchTranslationWordsFromGemini(game, englishLevel, levelConfiguration)
 
-    private suspend fun fetchWordsFromFirestore(levelId: String): List<TextElement> {
-        return try {
-            val snapshot = firestore.collection("academy")
-                .document("resources")
-                .collection("words")
-                .whereEqualTo("level", levelId)  // Assuming you store the level info in Firestore
-                .get()
-                .await()
-
-            snapshot.documents.mapNotNull { it.toObject(TextElement::class.java) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
-
     private suspend fun fetchTranslationWordsFromGemini(
         game: Game,
         englishLevel: EnglishLevel,
