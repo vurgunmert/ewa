@@ -8,8 +8,17 @@ data class Game(
     val geminiPrompts: Prompts = Prompts(),
     val levelConfiguration: Map<String, LevelConfiguration> = emptyMap() // Private field for direct mapping
 ) {
-    val levelConfigurations: Map<EnglishLevel, LevelConfiguration>
-        get() = levelConfiguration.mapKeys { (key, _) ->
-            EnglishLevel.fromKey(key) ?: throw IllegalArgumentException("Unknown level key: $key")
-        }
+    fun toConfig(levelId: String): GameConfig {
+        val englishLevel = EnglishLevel.fromKey(levelId)
+        val levelConfig = levelConfiguration[englishLevel.levelKey] ?: LevelConfiguration(6, 4)
+        return GameConfig(
+            gameId = gameId,
+            gameType = gameType,
+            names = names,
+            descriptions = descriptions,
+            geminiPrompts = geminiPrompts,
+            englishLevel = englishLevel,
+            levelConfiguration = levelConfig
+        )
+    }
 }

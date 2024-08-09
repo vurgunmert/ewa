@@ -25,7 +25,7 @@ fun GameHostScreen(
 
         is GameHostViewState.Ready -> {
             val state = (viewState as GameHostViewState.Ready)
-            MatchGameScreen(state.game, state.englishLevel, state.levelConfiguration)
+            MatchGameScreen(state.game)
         }
 
         is GameHostViewState.GameNotFound -> {

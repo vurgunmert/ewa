@@ -1,16 +1,10 @@
 package data.repository
 
-import domain.model.EnglishLevel
-import domain.model.Game
-import domain.model.LevelConfiguration
+import domain.model.GameConfig
 import domain.model.TextElement
 
 interface MatchGameRepository {
-    suspend fun getTextElements(
-        game: Game,
-        englishLevel: EnglishLevel,
-        levelConfiguration: LevelConfiguration
-    ): List<TextElement>
+    suspend fun getTextElements(game: GameConfig): List<TextElement>
     suspend fun endGame(gameId: String, levelId: String): Boolean
     fun addSeenAnswer(answer: String)
     fun addSeenAnswers(answers: List<String>)
