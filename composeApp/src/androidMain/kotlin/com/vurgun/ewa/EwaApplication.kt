@@ -1,21 +1,19 @@
 package com.vurgun.ewa
 
 import android.app.Application
-import com.google.firebase.Firebase
-import com.google.firebase.remoteconfig.remoteConfig
-import com.google.firebase.remoteconfig.remoteConfigSettings
+import com.google.firebase.FirebaseApp
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.vurgun.ewa.data.repository.GameRepositoryImpl
 import com.vurgun.ewa.data.repository.GeminiApiRepositoryImpl
+import com.vurgun.ewa.data.repository.RemoteConfigRepository
 import com.vurgun.ewa.presentation.gamehost.GameHostViewModel
 import com.vurgun.ewa.presentation.games.match.repository.MatchGameRepositoryImpl
 import com.vurgun.ewa.presentation.games.match.ui.AndroidMatchGameViewModel
 import data.repository.GameRepository
 import data.repository.MatchGameRepository
 import domain.repository.GeminiRepository
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -26,35 +24,26 @@ class EwaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        FirebaseApp.initializeApp(this)
+
         startKoin {
             androidContext(this@EwaApplication)
             modules(gamesModule)
             modules(presentationModule)
         }
 
-        val remoteConfig = Firebase.remoteConfig
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 3600
-        }
+        val remoteConfig = FirebaseRemoteConfig.getInstance()
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(0) //todo: prod 3600
+            .build()
         remoteConfig.setConfigSettingsAsync(configSettings)
-        remoteConfig.setDefaultsAsync(mapOf("welcome_message" to "Welcome to EWA"))
     }
 }
 
 val gamesModule = module {
-    single<GameRepository> { GameRepositoryImpl() } //TODO: secure api key
-    single<GeminiRepository> { GeminiApiRepositoryImpl("") }
-    single {
-        HttpClient { //TODO: General client
-            install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                })
-            }
-        }
-    }
+    single<RemoteConfigRepository> { RemoteConfigRepository() }
+    single<GameRepository> { GameRepositoryImpl() }
+    single<GeminiRepository> { GeminiApiRepositoryImpl(get()) }
     single<MatchGameRepository> { MatchGameRepositoryImpl(get(), get()) }
 }
 

@@ -3,9 +3,7 @@ package com.vurgun.ewa.presentation.games.match.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import data.repository.GameRepository
 import data.repository.MatchGameRepository
-import domain.model.EnglishLevel
-import domain.model.Game
-import domain.model.LevelConfiguration
+import domain.model.GameConfig
 import domain.model.TextElement
 import domain.repository.GeminiRepository
 import kotlinx.coroutines.tasks.await
@@ -18,34 +16,10 @@ class MatchGameRepositoryImpl(
     private val firestore = FirebaseFirestore.getInstance()
     private val currentGameState = mutableMapOf<String, Any>()
 
-    override suspend fun getTextElements(
-        game: Game,
-        englishLevel: EnglishLevel,
-        levelConfiguration: LevelConfiguration
-    ): List<TextElement> = fetchTranslationWordsFromGemini(game, englishLevel, levelConfiguration)
+    override suspend fun getTextElements(game: GameConfig): List<TextElement> = fetchTranslationWordsFromGemini(game)
 
-    private suspend fun fetchWordsFromFirestore(levelId: String): List<TextElement> {
-        return try {
-            val snapshot = firestore.collection("academy")
-                .document("resources")
-                .collection("words")
-                .whereEqualTo("level", levelId)  // Assuming you store the level info in Firestore
-                .get()
-                .await()
-
-            snapshot.documents.mapNotNull { it.toObject(TextElement::class.java) }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
-
-    private suspend fun fetchTranslationWordsFromGemini(
-        game: Game,
-        englishLevel: EnglishLevel,
-        levelConfig: LevelConfiguration,
-    ): List<TextElement> {
-        val prompt = generateGeminiPrompt(game, englishLevel, levelConfig)
+    private suspend fun fetchTranslationWordsFromGemini(game: GameConfig): List<TextElement> {
+        val prompt = generateGeminiPrompt(game)
         val response = geminiRepository.getWordTranslationList(prompt)
 
         return response.pairs.map { translation ->
@@ -58,18 +32,16 @@ class MatchGameRepositoryImpl(
     }
 
     private fun generateGeminiPrompt(
-        game: Game,
-        englishLevel: EnglishLevel,
-        levelConfig: LevelConfiguration,
+        game: GameConfig,
         topic: String? = null
     ): String {
-        val promptTemplate = game.geminiPrompts.excludePrevious ?: game.geminiPrompts.general
+        val promptTemplate = game.geminiPrompts.excludeSeen ?: game.geminiPrompts.general
         val interactedAnswers = getSeenAnswers().joinToString(", ")
 
         return promptTemplate
-            .replace("{answerCount}", levelConfig.answerCount.toString())
-            .replace("{englishLevel}", englishLevel.levelKey)
-            .replace("{topic}", topic ?: "Representing english level topics")
+            .replace("{answerCount}", game.levelConfiguration.answerCount.toString())
+            .replace("{englishLevel}", game.englishLevel.levelKey)
+            .replace("{topic}", topic ?: "General English")
             .replace("{interactedAnswers}", interactedAnswers)
     }
 
@@ -83,7 +55,7 @@ class MatchGameRepositoryImpl(
     override fun addSeenAnswers(answers: List<String>) {
         val seenAnswers = getSeenAnswers().toMutableList()
         seenAnswers.addAll(answers)
-        currentGameState["seenAnswers"] = seenAnswers
+        currentGameState["seenAnswers"] = seenAnswers.distinct()
     }
 
     override fun getSeenAnswers(): List<String> {

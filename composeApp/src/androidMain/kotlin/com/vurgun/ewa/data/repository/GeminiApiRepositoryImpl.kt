@@ -1,6 +1,5 @@
 package com.vurgun.ewa.data.repository
 
-import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.FunctionType
 import com.google.ai.client.generativeai.type.Schema
@@ -9,11 +8,13 @@ import domain.model.GeminiTranslationPairsResponse
 import domain.repository.GeminiRepository
 import kotlinx.serialization.json.Json
 
-class GeminiApiRepositoryImpl(apiKey: String) : GeminiRepository {
+class GeminiApiRepositoryImpl(
+    remoteConfigRepository: RemoteConfigRepository
+) : GeminiRepository {
 
     private val model = GenerativeModel(
         modelName = "gemini-1.5-flash",
-        apiKey = apiKey,
+        apiKey = remoteConfigRepository.fetchGeminiApiKey(),
         generationConfig = generationConfig {
             temperature = 0f
             topP = 0.95f
@@ -68,7 +69,7 @@ class GeminiApiRepositoryImpl(apiKey: String) : GeminiRepository {
 
     override suspend fun getWordTranslationList(prompt: String): GeminiTranslationPairsResponse {
         val response = model.generateContent(prompt)
-        return parseResponse(response.text!!)
+        return parseResponse(response.text!!) //TODO: handle optional
     }
 
     private fun parseResponse(response: String): GeminiTranslationPairsResponse {

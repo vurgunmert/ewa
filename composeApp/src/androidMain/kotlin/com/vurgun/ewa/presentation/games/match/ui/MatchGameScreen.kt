@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,17 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import domain.model.EnglishLevel
-import domain.model.Game
-import domain.model.LevelConfiguration
+import domain.model.GameConfig
 import domain.model.TextElement
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MatchGameScreen(
-    game: Game,
-    englishLevel: EnglishLevel,
-    levelConfiguration: LevelConfiguration,
+    game: GameConfig,
     viewModel: AndroidMatchGameViewModel = koinViewModel()
 ) {
     val textElements by viewModel.textElements.collectAsState()
@@ -36,7 +33,7 @@ fun MatchGameScreen(
     val secondaryLanguage = "tr"
 
     LaunchedEffect(game) {
-        viewModel.loadTextElements(game, englishLevel, levelConfiguration)
+        viewModel.loadTextElements(game)
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -53,6 +50,9 @@ fun MatchGameScreen(
         FlowLayout(textElements, isPrimary = true)
         Spacer(modifier = Modifier.height(16.dp))
         FlowLayout(textElements, isPrimary = false)
+        Button(onClick = { viewModel.nextLevel() }) {
+            Text(text = "Next Level")
+        }
     }
 }
 

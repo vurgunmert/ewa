@@ -35,9 +35,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
-                implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
                 implementation("io.ktor:ktor-client-core:2.3.12")
-                implementation("io.insert-koin:koin-core:3.5.6") // Add Koin Core
+                implementation("io.insert-koin:koin-core:3.5.6")
             }
         }
 
