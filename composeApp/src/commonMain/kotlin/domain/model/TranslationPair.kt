@@ -3,8 +3,7 @@ package domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TextElement(
+data class TranslationPair(
     val id: String,
-    val primaryText: String,
-    val secondaryText: String,
+    val translations: Map<String, String>
 )

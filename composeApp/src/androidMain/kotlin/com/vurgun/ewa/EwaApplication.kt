@@ -4,9 +4,18 @@ import android.app.Application
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import com.vurgun.ewa.presentation.games.matchgame.MatchGameRepositoryImpl
-import com.vurgun.ewa.presentation.games.matchgame.ui.AndroidMatchGameViewModel
+import com.vurgun.ewa.data.repository.GameRepositoryImpl
+import com.vurgun.ewa.data.repository.GeminiApiRepositoryImpl
+import com.vurgun.ewa.presentation.gamehost.GameHostViewModel
+import com.vurgun.ewa.presentation.games.match.repository.MatchGameRepositoryImpl
+import com.vurgun.ewa.presentation.games.match.ui.AndroidMatchGameViewModel
+import data.repository.GameRepository
 import data.repository.MatchGameRepository
+import domain.repository.GeminiRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -17,13 +26,9 @@ class EwaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val presentationModule = module {
-            viewModel { AndroidMatchGameViewModel(get()) }
-        }
-
         startKoin {
             androidContext(this@EwaApplication)
-            modules(matchGameModule)
+            modules(gamesModule)
             modules(presentationModule)
         }
 
@@ -36,7 +41,24 @@ class EwaApplication : Application() {
     }
 }
 
-val matchGameModule = module {
-    single<MatchGameRepository> { MatchGameRepositoryImpl() }
+val gamesModule = module {
+    single<GameRepository> { GameRepositoryImpl() } //TODO: secure api key
+    single<GeminiRepository> { GeminiApiRepositoryImpl("") }
+    single {
+        HttpClient { //TODO: General client
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                })
+            }
+        }
+    }
+    single<MatchGameRepository> { MatchGameRepositoryImpl(get(), get()) }
+}
+
+val presentationModule = module {
     viewModel { AndroidMatchGameViewModel(get()) }
+    viewModel { GameHostViewModel(get()) }
 }
